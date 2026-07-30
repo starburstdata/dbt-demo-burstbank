@@ -1,0 +1,31 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: "Customer dimension with demographics, segmentation, and state-level geographic enrichment"
+    columns:
+      - name: custkey
+        description: "Primary key"
+        tests:
+          - not_null
+          - unique
+
+  - name: fct_payments
+    description: "All payment events across credit cards, mortgages, and auto loans"
+    columns:
+      - name: custkey
+        tests:
+          - not_null
+      - name: product_type
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['credit_card', 'mortgage', 'auto_loan']
+
+  - name: rpt_customer_risk
+    description: "Customer-level risk summary with delinquency rates and outstanding balances by product"
+    columns:
+      - name: custkey
+        tests:
+          - not_null
+          - unique

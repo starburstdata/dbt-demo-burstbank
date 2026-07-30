@@ -1,0 +1,69 @@
+version: 2
+
+models:
+  - name: stg_customers
+    columns:
+      - name: custkey
+        tests:
+          - not_null
+          - unique
+
+  - name: stg_accounts
+    columns:
+      - name: acctkey
+        tests:
+          - not_null
+          - unique
+      - name: custkey
+        tests:
+          - not_null
+
+  - name: stg_customer_profiles
+    columns:
+      - name: profilekey
+        tests:
+          - not_null
+      - name: custkey
+        tests:
+          - not_null
+
+  - name: stg_product_profiles
+    columns:
+      - name: profilekey
+        tests:
+          - not_null
+      - name: custkey
+        tests:
+          - not_null
+
+  - name: stg_employees
+    columns:
+      - name: employee_id
+        tests:
+          - not_null
+          - unique
+
+  - name: stg_credit_card_payments
+    columns:
+      - name: cc_number
+        tests:
+          - not_null
+
+  - name: stg_mortgage_payments
+    columns:
+      - name: mortgage_id
+        tests:
+          - not_null
+
+  - name: stg_auto_loan_payments
+    columns:
+      - name: auto_loan_id
+        tests:
+          - not_null
+
+  - name: stg_state_census
+    columns:
+      - name: abbreviation
+        tests:
+          - not_null
+          - unique

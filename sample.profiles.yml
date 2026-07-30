@@ -1,0 +1,25 @@
+# Copy this file to ~/.dbt/profiles.yml and replace the host placeholder.
+# Set GALAXY_HOST as an environment variable before running dbt.
+# Note: source data is read from sample.burstbank (read-only).
+# dbt writes staging views to lakehouse.burstbank_dbt_staging and mart tables to lakehouse.burstbank_dbt_marts.
+burstbank:
+  target: dev
+  outputs:
+    dev:
+      type: trino
+      host: "{{ env_var('GALAXY_HOST') }}"
+      port: 443
+      http_scheme: https
+      database: lakehouse
+      schema: burstbank_dbt
+      threads: 4
+
+      # --- Authentication options (uncomment one) ---
+
+      # 1. OAuth (browser-based SSO) — recommended for interactive use
+      method: oauth
+
+      # 2. Username + password
+      # method: ldap
+      # user: "{{ env_var('GALAXY_USER') }}"
+      # password: "{{ env_var('GALAXY_PASSWORD') }}"

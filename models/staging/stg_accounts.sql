@@ -1,0 +1,23 @@
+select
+    custkey,
+    acctkey,
+    products,
+    cc_number,
+    try_cast(cc_open_date as date)           as cc_open_date,
+    try_cast(cc_closed_date as date)         as cc_closed_date,
+    cc_balance,
+    cc_status,
+    cc_default = 'Y'                         as cc_is_defaulted,
+    mortgage_id,
+    try_cast(mortgage_open_date as date)     as mortgage_open_date,
+    try_cast(mortgage_closed_date as date)   as mortgage_closed_date,
+    mortgage_balance,
+    mortgage_status,
+    mortgage_default = 'Y'                   as mortgage_is_defaulted,
+    auto_loan_id,
+    try_cast(auto_loan_open_date as date)    as auto_loan_open_date,
+    try_cast(auto_loan_closed_date as date)  as auto_loan_closed_date,
+    auto_loan_balance,
+    auto_loan_status,
+    auto_loan_default = 'Y'                  as auto_loan_is_defaulted
+from {{ source('burstbank', 'account') }}
