@@ -57,9 +57,18 @@ dbt run -s bronze_crm_interactions --vars '{crm_mode: postgres}'
 dbt run -s bronze_crm_interactions --vars '{crm_mode: postgres, crm_bronze_materialization: table}'
 ```
 
-Presenter setup for the `postgres` mode: run `scripts/load_crm_postgres.sql`
-against your Postgres instance, then add a PostgreSQL catalog named `crm` in
-Galaxy and attach it to the workshop cluster.
+Presenter setup for the `postgres` mode: add a PostgreSQL catalog named `crm`
+in Galaxy, attach it to the workshop cluster, then load the CRM tables in one
+of two ways:
+
+- **From Galaxy (no `psql` needed):** paste `scripts/load_crm_trino.sql` into
+  the Galaxy query editor and run its statements in order. The `crm` catalog
+  must allow writes. The script drops and recreates the two CRM tables, so
+  it's safe to re-run.
+- **With `psql`:** run `scripts/load_crm_postgres.sql` against the Postgres
+  database directly, from the repo root so its `\copy` paths resolve.
+
+Both load the same rows as `seeds/*.csv`.
 
 **Seed data note:** `seeds/*.csv` cover all 1,000 `sample.burstbank`
 customers (`custkey` 1000001–1001000). They're produced by
