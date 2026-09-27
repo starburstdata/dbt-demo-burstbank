@@ -2,6 +2,11 @@
 
 A dbt project built on the Starburst Galaxy `sample.burstbank` dataset — a fictional retail bank with customers, accounts, and payment history across three product lines: credit cards, mortgages, and auto loans.
 
+> **Running the BurstBank 2.0 workshop?** See [WORKSHOP.md](WORKSHOP.md). The
+> workshop builds this project up into a bronze/silver/gold medallion with a
+> federated CRM source and a governed data product, across the
+> `checkpoint-0` … `checkpoint-4` branches.
+
 ## Prerequisites
 
 - Python 3.9+
