@@ -61,12 +61,13 @@ Presenter setup for the `postgres` mode: run `scripts/load_crm_postgres.sql`
 against your Postgres instance, then add a PostgreSQL catalog named `crm` in
 Galaxy and attach it to the workshop cluster.
 
-**Seed data note:** `seeds/*.csv` in this repo are placeholder data with
-fabricated customer keys (`1000000`–`1000049`), generated so the repo builds
-without live cluster access. Before rehearsing for real, run
-`scripts/generate_crm_data.py` (needs `GALAXY_HOST`/`GALAXY_USER`/
-`GALAXY_PASSWORD` and `pip install -r requirements.txt`) to regenerate the
-CSVs keyed to real `sample.burstbank` customers, and re-run `dbt seed`.
+**Seed data note:** `seeds/*.csv` cover all 1,000 `sample.burstbank`
+customers (`custkey` 1000001–1001000). They're produced by
+`scripts/generate_crm_data.py`, which reads the customer keys in `custkey`
+order and uses a fixed random seed, so re-running it (needs
+`GALAXY_HOST`/`GALAXY_USER`/`GALAXY_PASSWORD` and
+`pip install -r requirements.txt`) reproduces the committed files exactly.
+You only need to re-run it if the sample dataset's customers change.
 
 ## checkpoint-2: silver layer
 
@@ -140,8 +141,9 @@ AI agent finale answers, run directly against `dp_customer_retention_risk`
 
 ## Merge checklist
 
-- [ ] Regenerate real seed CSVs with `scripts/generate_crm_data.py` against a
-      live Galaxy cluster (this repo ships fabricated placeholders only)
+- [ ] Spot-check that the CRM metrics in `dp_customer_retention_risk` are
+      non-zero for most customers (confirms the seed `customer_id`s join to
+      real `custkey`s)
 - [ ] `dbt deps && dbt seed && dbt build` passes on a fresh Galaxy trial account
 - [ ] Confirm `custkey`'s actual SQL type in `sample.burstbank.customer` via
       `information_schema.columns`, and correct the `data_type: bigint` guess

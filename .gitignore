@@ -4,3 +4,4 @@ dbt_packages/
 logs/
 node_modules
 .idea
+.venv/
