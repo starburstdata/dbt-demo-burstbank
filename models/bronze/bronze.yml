@@ -70,3 +70,24 @@ models:
           # not_null/unique pass on an empty table; this fails if the
           # state-level filter ever drops every row again
           - dbt_utils.at_least_one
+
+  - name: bronze_crm_interactions
+    description: Customer service contacts (calls, chats, branch visits, complaints), federated or seeded from the CRM.
+    columns:
+      - name: interaction_id
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        tests:
+          - not_null
+
+  - name: bronze_crm_digital_activity
+    description: Monthly summary of each customer's mobile and web app usage, federated or seeded from the CRM.
+    columns:
+      - name: customer_id
+        tests:
+          - not_null
+      - name: activity_month
+        tests:
+          - not_null

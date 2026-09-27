@@ -14,3 +14,17 @@ sources:
       - name: mortgage_payment
       - name: product_profile
       - name: state_census
+
+  - name: crm
+    description: >
+      Operational CRM system. Left in Postgres and queried in place through
+      Starburst federation. Nothing is copied or ingested ahead of time.
+      Read in crm_mode postgres; in seed mode the bronze models read the
+      seeds instead (see macros/crm_table.sql).
+    database: "{{ var('crm_catalog') }}"
+    schema: "{{ var('crm_schema') }}"
+    tables:
+      - name: crm_interactions
+        description: Customer service contacts (calls, chats, branch visits, complaints).
+      - name: crm_digital_activity
+        description: Monthly summary of each customer's mobile and web app usage.
