@@ -64,10 +64,12 @@ Galaxy and attach it to the workshop cluster.
 **Seed data note:** `seeds/*.csv` cover all 1,000 `sample.burstbank`
 customers (`custkey` 1000001–1001000). They're produced by
 `scripts/generate_crm_data.py`, which reads the customer keys in `custkey`
-order and uses a fixed random seed, so re-running it (needs
-`GALAXY_HOST`/`GALAXY_USER`/`GALAXY_PASSWORD` and
-`pip install -r requirements.txt`) reproduces the committed files exactly.
-You only need to re-run it if the sample dataset's customers change.
+order and uses a fixed random seed, so re-running it reproduces the committed
+files exactly. You only need to re-run it if the sample dataset's customers
+change. To run it, `pip install -r requirements.txt`, set `GALAXY_HOST`, and
+run `python scripts/generate_crm_data.py`. It signs in with Galaxy OAuth: a
+browser window opens for the SSO login (the URL is also printed, in case no
+browser opens). No password is needed. `GALAXY_USER` is optional.
 
 ## checkpoint-2: silver layer
 
