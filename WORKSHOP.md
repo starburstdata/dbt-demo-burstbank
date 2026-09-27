@@ -83,12 +83,19 @@ Adds `models/silver/`:
   interactions/complaints in the last 90 days, and login trends over the
   last 6 months (`logins_last_3m` vs `logins_prior_3m`).
 
-Note: the 90-day and 3-month windows use `current_date`. The CRM generator
-anchors data to **2026-09-29**, so rehearse close to that date or the
-engagement-drop numbers will look flat. The login windows are truncated to
-month starts (`date_trunc('month', …)`) so both 3-month windows cover three
-whole months — compare against a raw mid-month cutoff and every steady
-customer picks up a spurious ~33% engagement drop.
+Note: the 90-day and 3-month windows are measured from the `as_of_date` var
+(default **2026-09-29**, the date the CRM generator builds its data around),
+not `current_date`. The results are therefore the same whatever day you
+rehearse or present on. If you regenerate the seeds around a different date,
+change `today` in `scripts/generate_crm_data.py` and `as_of_date` in
+`dbt_project.yml` together. For a one-off, you can override it without
+editing anything: `dbt build --vars '{as_of_date: "2026-10-15"}'`.
+
+The login windows cover complete calendar months before `as_of_date`
+(Jun–Aug vs Mar–May for the default), and the current partial month is
+excluded. If you compare against a raw mid-month cutoff instead, the two
+windows cover different numbers of months, and every steady customer picks up
+a spurious ~33% engagement drop.
 
 **Verify the incremental behavior** — run `slv_payments` twice and confirm a
 second Iceberg snapshot was created:

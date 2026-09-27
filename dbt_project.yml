@@ -30,6 +30,10 @@ vars:
   crm_schema: public
   # Federate vs materialize switch for the optionality moment
   crm_bronze_materialization: view
+  # The date the CRM lookback windows are measured from. Pinned rather than
+  # current_date so results don't drift with the calendar; must match `today`
+  # in scripts/generate_crm_data.py, which the seed data is generated around.
+  as_of_date: '2026-09-29'
 
 models:
   burstbank:
