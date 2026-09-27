@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: slv_payments
+    description: >
+      All payment events across credit cards, mortgages, and auto loans,
+      unioned from the per-product bronze payment tables and enriched with
+      each account's owning customer. Incremental Iceberg table, merged on
+      payment_key and partitioned by month(payment_date).
+    columns:
+      - name: payment_key
+        tests:
+          - not_null
+          - unique
+      - name: custkey
+        tests:
+          - not_null
+      - name: product_type
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['credit_card', 'mortgage', 'auto_loan']
+
+  - name: slv_customer_360
+    description: >
+      Core banking customer dimension joined with CRM engagement signals:
+      service interactions and complaints in the last 90 days, and digital
+      (mobile/web) login trends over the last 6 months.
+    columns:
+      - name: custkey
+        tests:
+          - not_null
+          - unique
