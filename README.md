@@ -44,8 +44,8 @@ dbt docs generate && dbt docs serve   # browse the data catalog
 To build a single layer:
 
 ```bash
-dbt run --select staging
-dbt run --select marts
+dbt run --select bronze
+dbt run --select gold
 ```
 
 ## Project structure
@@ -53,7 +53,7 @@ dbt run --select marts
 ```
 models/
 ├── sources.yml          # points to sample.burstbank (read-only source)
-├── staging/             # one view per source table, written to lakehouse.burstbank_staging
+├── bronze/              # one view per source table, written to lakehouse.burstbank_bronze
 │   ├── stg_accounts.sql
 │   ├── stg_auto_loan_payments.sql
 │   ├── stg_credit_card_payments.sql
@@ -63,7 +63,7 @@ models/
 │   ├── stg_mortgage_payments.sql
 │   ├── stg_product_profiles.sql
 │   └── stg_state_census.sql
-└── marts/               # analytics-ready tables, written to lakehouse.burstbank_marts
+└── gold/                # analytics-ready tables, written to lakehouse.burstbank_gold
     ├── dim_customers.sql
     ├── fct_payments.sql
     └── rpt_customer_risk.sql
@@ -85,11 +85,11 @@ models/
 | `employee` | Bank employees, used to resolve loan officer names |
 | `state_census` | US state population estimates for geographic enrichment |
 
-### Staging (`lakehouse.burstbank_staging`)
+### Bronze (`lakehouse.burstbank_bronze`)
 
 Views that clean the source layer: varchar dates are cast to `date`, boolean flags (`Y`/`N`) are cast to booleans, and the `manger_id` typo in the `employee` table is corrected to `manager_id`.
 
-### Marts (`lakehouse.burstbank_marts`)
+### Gold (`lakehouse.burstbank_gold`)
 
 | Model | Description |
 |---|---|
@@ -102,5 +102,5 @@ Views that clean the source layer: varchar dates are cast to `date`, boolean fla
 | | Catalog | Schema |
 |---|---|---|
 | Source data (read-only) | `sample` | `burstbank` |
-| Staging views | `lakehouse` | `burstbank_staging` |
-| Mart tables | `lakehouse` | `burstbank_marts` |
+| Bronze views | `lakehouse` | `burstbank_bronze` |
+| Gold tables | `lakehouse` | `burstbank_gold` |

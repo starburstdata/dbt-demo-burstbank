@@ -1,7 +1,11 @@
 # Copy this file to ~/.dbt/profiles.yml and replace the host placeholder.
 # Set GALAXY_HOST as an environment variable before running dbt.
 # Note: source data is read from sample.burstbank (read-only).
-# dbt writes staging views to lakehouse.burstbank_dbt_staging and mart tables to lakehouse.burstbank_dbt_marts.
+# dbt writes bronze views to lakehouse.burstbank_bronze and gold tables to
+# lakehouse.burstbank_gold. The +schema values in dbt_project.yml are used
+# verbatim rather than prefixed with the `schema:` below -- see
+# macros/generate_schema_name.sql. The `schema:` below is only the fallback
+# for anything without a +schema of its own.
 burstbank:
   target: dev
   outputs:
