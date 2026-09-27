@@ -30,3 +30,67 @@ models:
         tests:
           - not_null
           - unique
+
+  - name: dp_customer_retention_risk
+    description: >
+      Governed data product listing, for every customer, their retention risk
+      and balance exposure. Combines core banking delinquency with CRM
+      engagement signals. Owner: Retail Analytics. Refreshed daily.
+    config:
+      contract:
+        enforced: true
+      meta:
+        owner: retail-analytics
+        data_product: true
+    columns:
+      - name: custkey
+        data_type: varchar
+        description: Unique BurstBank customer identifier.
+        tests: [unique, not_null]
+      # state, country and segment pass through un-cast from the source. If a
+      # source column is bounded (varchar(2), varchar(20)...) the contract will
+      # reject `varchar` -- cast it in the model, or set the exact type here.
+      - name: state
+        data_type: varchar
+        description: >
+          Two-letter code for the state (US) or province/territory (Canada) of
+          the customer's primary address, for example CA for California or BC
+          for British Columbia. Read it together with country.
+      - name: country
+        data_type: varchar
+        description: Country of the customer's primary address, US or CA (Canada).
+      - name: segment
+        data_type: varchar
+        description: Marketing segment from the customer profile.
+      - name: delinquency_rate
+        data_type: double
+        description: Share of the customer's payments that were late, across all products.
+      - name: total_outstanding_balance
+        data_type: decimal(18,2)
+        description: >
+          Combined outstanding balance across credit card, mortgage and auto
+          loan. In USD for every customer, including those in Canada.
+      - name: complaints_90d
+        data_type: bigint
+        description: Complaints logged in the CRM in the last 90 days.
+      - name: close_account_requests_90d
+        data_type: bigint
+        description: Contacts in the last 90 days where the customer asked to close an account.
+      - name: engagement_drop_pct
+        data_type: double
+        description: Drop in app logins over the last 3 months compared with the prior 3 months. 0.4 means 40% fewer logins.
+      - name: retention_risk_score
+        data_type: integer
+        description: 0 to 100. Higher means more likely to leave.
+        tests:
+          - not_null
+          - dbt_utils.accepted_range: {arguments: {min_value: 0, max_value: 100}}
+      - name: retention_risk_tier
+        data_type: varchar
+        description: >
+          high, medium or low. High: 7% or more of the customer's payments were
+          late, or they asked to close an account in the last 90 days. Medium:
+          5% or more late, or 2 or more complaints in the last 90 days. Low:
+          everyone else.
+        tests:
+          - accepted_values: {arguments: {values: ['high', 'medium', 'low']}}
