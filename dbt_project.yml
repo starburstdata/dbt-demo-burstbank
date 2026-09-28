@@ -20,7 +20,24 @@ clean-targets:
   - "dbt_packages"
   - "logs"
 
-require-dbt-version: [">=1.9.0", "<2.0.0"]
+# 1.10.5 is the first release that understands the `arguments:` form used by
+# the generic tests in models/**/*.yml.
+require-dbt-version: [">=1.10.5", "<2.0.0"]
+
+flags:
+  # dbt-trino skips TLS certificate checks by default (legacy behavior).
+  # Turning this on makes it verify Galaxy's certificate like any HTTPS
+  # client. Don't use the profile's `suppress_cert_warning` instead: it only
+  # hides the warning and leaves the connection unverified.
+  require_certificate_validation: true
+  # Read generic test parameters from `arguments:`. Without this, dbt 1.10
+  # and 1.11 treat `arguments` as a parameter name and the tests fail.
+  require_generic_test_arguments_property: true
+  warn_error_options:
+    # The layer configs below exist before every layer has models (silver
+    # arrives in checkpoint-2), which dbt would otherwise warn about.
+    silence:
+      - UnusedResourceConfigPath
 
 vars:
   # 'postgres' = live federated CRM (presenter)

@@ -14,6 +14,9 @@ burstbank:
       host: "{{ env_var('GALAXY_HOST') }}"
       port: 443
       http_scheme: https
+      # Verify Galaxy's TLS certificate. dbt-trino skips the check unless this
+      # is set, and `dbt debug` ignores the project-level flag, so set it here.
+      cert: true
       database: lakehouse
       schema: burstbank_dbt
       threads: 4

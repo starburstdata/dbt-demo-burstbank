@@ -20,7 +20,8 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: ['credit_card', 'mortgage', 'auto_loan']
+              arguments:
+                values: ['credit_card', 'mortgage', 'auto_loan']
 
   - name: rpt_customer_risk
     description: "Customer-level risk summary with delinquency rates and outstanding balances by product"
