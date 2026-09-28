@@ -40,9 +40,9 @@ flags:
       - UnusedResourceConfigPath
 
 vars:
-  # 'postgres' = live federated CRM (presenter)
-  # 'seed'     = CSV fallback loaded with dbt seed (attendees)
-  crm_mode: seed
+  # 'postgres' = read the live CRM in Postgres through federation (default)
+  # 'seed'     = offline fallback: read seeds/*.csv, loaded by dbt build
+  crm_mode: postgres
   # Where the live CRM tables are in Galaxy (catalog.schema). Keep in step with
   # CRM_TABLE_PREFIX in scripts/generate_crm_data.py and the schema in
   # scripts/load_crm_postgres.sql.
@@ -77,3 +77,9 @@ models:
 seeds:
   burstbank:
     +schema: burstbank_crm_seed
+    # The seeds are only the offline fallback for the live CRM, so only load
+    # them in seed mode; otherwise dbt build would copy them on every run.
+    # The vars block above isn't visible while dbt_project.yml itself is being
+    # read (only --vars from the command line is), so this lookup carries its
+    # own default, which must match crm_mode above.
+    +enabled: "{{ var('crm_mode', 'postgres') == 'seed' }}"

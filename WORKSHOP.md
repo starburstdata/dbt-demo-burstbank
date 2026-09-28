@@ -9,8 +9,12 @@ files a section describes only exist from that checkpoint onward.
 
 ```bash
 git checkout checkpoint-N
-dbt deps && dbt seed && dbt build
+dbt deps && dbt build
 ```
+
+From checkpoint-1 on, the build reads the live CRM tables in `postgresql.crm`,
+so the cluster you build against must have the `postgresql` catalog attached.
+Nobody needs to run `dbt seed`.
 
 ## checkpoint-0: bronze/gold rename
 
@@ -34,52 +38,49 @@ No new models yet; this is the same data as `main`, just relaid out.
 ## checkpoint-1: CRM source
 
 Adds a `crm` source (`models/sources.yml`) and two bronze models,
-`bronze_crm_interactions` and `bronze_crm_digital_activity`.
+`bronze_crm_interactions` and `bronze_crm_digital_activity`. They read the
+bank's CRM where it lives, in Postgres (`postgresql.crm`: catalog
+`postgresql`, schema `crm`), through Starburst federation. Nothing is copied
+or ingested ahead of time.
 
-The `crm_mode` var controls where the two bronze models read from:
-
-- `crm_mode: seed` (default) — the seed tables `dbt seed` creates from
-  `seeds/crm_interactions.csv` and `seeds/crm_digital_activity.csv`. This is
-  what attendees use.
-- `crm_mode: postgres` (presenter only) — the live Postgres tables in
-  `postgresql.crm` (catalog `postgresql`, schema `crm`), through the `crm`
-  source and Starburst federation. Nothing is copied ahead of time.
-
-The model SQL is identical either way: each model reads
-`{{ crm_table('crm_interactions') }}`, and the `crm_table` macro picks the
-table. In seed mode it uses `ref()` rather than the source, so dbt knows the
-models depend on the seeds and always loads the seeds first.
-
-**Optionality moment** (presenter):
+**Optionality moment:**
 
 ```bash
 # Federated: reads Postgres live, nothing is copied
-dbt run -s bronze_crm_interactions --vars '{crm_mode: postgres}'
+dbt run -s bronze_crm_interactions
 
 # Materialized: same model, now an Iceberg table. The SQL doesn't change.
-dbt run -s bronze_crm_interactions --vars '{crm_mode: postgres, crm_bronze_materialization: table}'
+dbt run -s bronze_crm_interactions --vars '{crm_bronze_materialization: table}'
 ```
 
-Presenter setup for the `postgres` mode: add a PostgreSQL catalog named
-`postgresql` in Galaxy and attach it to the workshop cluster. The CRM tables
-live in its `crm` schema. Load them in one of two ways:
+**Offline fallback.** If Postgres is ever unreachable, `--vars '{crm_mode: seed}'`
+makes the bronze models read the same rows from `seeds/*.csv` instead, loaded
+by `dbt build`. The seeds are disabled in the default `postgres` mode, so a
+normal build never loads them. Each model reads
+`{{ crm_table('crm_interactions') }}`, and the `crm_table` macro picks the
+table: the `crm` source for Postgres, or `ref()` to the seed in seed mode, so
+dbt knows the models depend on the seeds and loads the seeds first.
+
+**Loading the CRM into Postgres (one-time, before the workshop).** Add a
+PostgreSQL catalog named `postgresql` in Galaxy and attach it to every cluster
+used in the workshop. Then load the tables into its `crm` schema in one of two
+ways:
 
 - **From Galaxy (no `psql` needed):** paste `scripts/load_crm_trino.sql` into
   the Galaxy query editor and run its statements in order. The `postgresql`
-  catalog must allow writes. The script drops and recreates the two CRM tables, so
-  it's safe to re-run.
+  catalog must allow writes. The script drops and recreates the two CRM
+  tables, so it's safe to re-run.
 - **With `psql`:** run `scripts/load_crm_postgres.sql` against the Postgres
   database directly, from the repo root so its `\copy` paths resolve.
 
-If your catalog or schema is named differently, change `crm_catalog` and
-`crm_schema` in `dbt_project.yml` and `CRM_TABLE_PREFIX` in
-`scripts/generate_crm_data.py` (then re-run it to regenerate
-`load_crm_trino.sql`), and edit the schema in `load_crm_postgres.sql`.
+Both load exactly the rows in `seeds/*.csv`. If your catalog or schema is
+named differently, change `crm_catalog` and `crm_schema` in `dbt_project.yml`
+and `CRM_TABLE_PREFIX` in `scripts/generate_crm_data.py` (then re-run it to
+regenerate `load_crm_trino.sql`), and edit the schema in
+`load_crm_postgres.sql`.
 
-Both load the same rows as `seeds/*.csv`.
-
-**Seed data note:** `seeds/*.csv` cover all 1,000 `sample.burstbank`
-customers (`custkey` 1000001–1001000). They're produced by
+**Where the CRM data comes from:** `seeds/*.csv` cover all 1,000
+`sample.burstbank` customers (`custkey` 1000001–1001000). They're produced by
 `scripts/generate_crm_data.py`, which reads the customer keys in `custkey`
 order and uses a fixed random seed, so re-running it reproduces the committed
 files exactly. You only need to re-run it if the sample dataset's customers
@@ -163,7 +164,8 @@ AI agent finale answers, run directly against `dp_customer_retention_risk`
 - [x] CRM metrics in `dp_customer_retention_risk` join to real customers —
       confirmed: 111 with complaints, 60 with close requests, 163 with an
       engagement drop, matching the seed files
-- [ ] `dbt deps && dbt seed && dbt build` passes on a fresh Galaxy trial account
+- [ ] `dbt deps && dbt build` passes on a fresh Galaxy trial account with the
+      `postgresql` catalog attached
 - [x] Contract types in `gold.yml` match what dbt-trino returns — confirmed
       on the first real build. `custkey` is `varchar` in the source (not
       `bigint` as first assumed); every other column matched as written
