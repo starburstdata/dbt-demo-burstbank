@@ -26,8 +26,11 @@ vars:
   # 'postgres' = live federated CRM (presenter)
   # 'seed'     = CSV fallback loaded with dbt seed (attendees)
   crm_mode: seed
-  crm_catalog: crm
-  crm_schema: public
+  # Where the live CRM tables are in Galaxy (catalog.schema). Keep in step with
+  # CRM_TABLE_PREFIX in scripts/generate_crm_data.py and the schema in
+  # scripts/load_crm_postgres.sql.
+  crm_catalog: postgresql
+  crm_schema: crm
   # Federate vs materialize switch for the optionality moment
   crm_bronze_materialization: view
   # The date the CRM lookback windows are measured from. Pinned rather than

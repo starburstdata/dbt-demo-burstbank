@@ -41,8 +41,9 @@ The `crm_mode` var controls where the source actually points:
 - `crm_mode: seed` (default) — the source reads the tables `dbt seed`
   creates from `seeds/crm_interactions.csv` and `seeds/crm_digital_activity.csv`.
   This is what attendees use.
-- `crm_mode: postgres` (presenter only) — the source reads a live Postgres
-  `crm` catalog through Starburst federation. Nothing is copied ahead of time.
+- `crm_mode: postgres` (presenter only) — the source reads the live Postgres
+  tables in `postgresql.crm` (catalog `postgresql`, schema `crm`) through
+  Starburst federation. Nothing is copied ahead of time.
 
 The model SQL is identical either way — only the source's resolved
 database/schema changes.
@@ -57,16 +58,21 @@ dbt run -s bronze_crm_interactions --vars '{crm_mode: postgres}'
 dbt run -s bronze_crm_interactions --vars '{crm_mode: postgres, crm_bronze_materialization: table}'
 ```
 
-Presenter setup for the `postgres` mode: add a PostgreSQL catalog named `crm`
-in Galaxy, attach it to the workshop cluster, then load the CRM tables in one
-of two ways:
+Presenter setup for the `postgres` mode: add a PostgreSQL catalog named
+`postgresql` in Galaxy and attach it to the workshop cluster. The CRM tables
+live in its `crm` schema. Load them in one of two ways:
 
 - **From Galaxy (no `psql` needed):** paste `scripts/load_crm_trino.sql` into
-  the Galaxy query editor and run its statements in order. The `crm` catalog
-  must allow writes. The script drops and recreates the two CRM tables, so
+  the Galaxy query editor and run its statements in order. The `postgresql`
+  catalog must allow writes. The script drops and recreates the two CRM tables, so
   it's safe to re-run.
 - **With `psql`:** run `scripts/load_crm_postgres.sql` against the Postgres
   database directly, from the repo root so its `\copy` paths resolve.
+
+If your catalog or schema is named differently, change `crm_catalog` and
+`crm_schema` in `dbt_project.yml` and `CRM_TABLE_PREFIX` in
+`scripts/generate_crm_data.py` (then re-run it to regenerate
+`load_crm_trino.sql`), and edit the schema in `load_crm_postgres.sql`.
 
 Both load the same rows as `seeds/*.csv`.
 
@@ -168,5 +174,5 @@ AI agent finale answers, run directly against `dp_customer_retention_risk`
       another column or the incremental MERGE will fail on the second run
 - [ ] Incremental run on `slv_payments` creates a second snapshot
 - [ ] Column comments visible in Starburst for the gold data product
-- [ ] `crm_mode: postgres` run succeeds against the presenter `crm` catalog
+- [ ] `crm_mode: postgres` run succeeds against `postgresql.crm`
 - [ ] Checkpoint branches `checkpoint-0` to `checkpoint-4` build independently
