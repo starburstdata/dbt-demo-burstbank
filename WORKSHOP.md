@@ -162,16 +162,10 @@ AI agent finale answers, run directly against `dp_customer_retention_risk`
       non-zero for most customers (confirms the seed `customer_id`s join to
       real `custkey`s)
 - [ ] `dbt deps && dbt seed && dbt build` passes on a fresh Galaxy trial account
-- [ ] Confirm `custkey`'s actual SQL type in `sample.burstbank.customer` via
-      `information_schema.columns`, and correct the `data_type: bigint` guess
-      in `models/gold/gold.yml` if it differs
-- [ ] Contract types in `gold.yml` match what dbt-trino actually returns,
-      especially `bigint` from `count`/`count_if`, the decimal precision on
-      `total_outstanding_balance`, and the two pass-through varchars (`state`,
-      `segment`) if their source columns turn out to be length-bounded
-- [ ] `slv_payments`' `unique` test on `payment_key` passes on real data — if
-      an account can pay twice in one day for the same amount, the key needs
-      another column or the incremental MERGE will fail on the second run
+- [x] Contract types in `gold.yml` match what dbt-trino returns — confirmed
+      on the first real build. `custkey` is `varchar` in the source (not
+      `bigint` as first assumed); every other column matched as written
+- [x] `slv_payments`' `unique` test on `payment_key` passes on real data
 - [ ] Incremental run on `slv_payments` creates a second snapshot
 - [ ] Column comments visible in Starburst for the gold data product
 - [ ] `crm_mode: postgres` run succeeds against `postgresql.crm`
