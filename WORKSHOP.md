@@ -174,5 +174,7 @@ AI agent finale answers, run directly against `dp_customer_retention_risk`
       (Iceberg records each MERGE run as an `overwrite` snapshot)
 - [x] Column comments visible in Starburst for the gold data product —
       confirmed for the table and all 10 columns
-- [ ] `crm_mode: postgres` run succeeds against `postgresql.crm`
-- [ ] Checkpoint branches `checkpoint-0` to `checkpoint-4` build independently
+- [x] Builds read the live CRM from `postgresql.crm` (the default), and its
+      contents match `seeds/*.csv` exactly
+- [x] Checkpoint branches `checkpoint-0` to `checkpoint-4` build independently —
+      each from scratch (`dbt build --full-refresh`), plus the seed fallback
