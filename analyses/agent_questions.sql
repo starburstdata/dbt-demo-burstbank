@@ -4,14 +4,12 @@ from {{ ref('dp_customer_retention_risk') }}
 group by 1
 order by 3 desc;
 
--- Q2: Which states or provinces have the most high-risk customers?
--- (Customers are in the US and Canada, so state is a state or province code.)
-select state, country, count(*) as high_risk_customers
+-- Q2: Which country has the most high-risk customers?
+select country, count(*) as high_risk_customers
 from {{ ref('dp_customer_retention_risk') }}
 where retention_risk_tier = 'high'
-group by 1, 2
-order by 3 desc, 1
-limit 10;
+group by 1
+order by 2 desc;
 
 -- Q3: Top 10 customers by engagement drop who also have an open mortgage
 select d.custkey, d.engagement_drop_pct, r.mortgage_balance
