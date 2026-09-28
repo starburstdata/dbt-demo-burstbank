@@ -11,10 +11,12 @@ where retention_risk_tier = 'high'
 group by 1
 order by 2 desc;
 
--- Q3: Top 10 customers by engagement drop who also have an open mortgage
+-- Q3: Which 3 mortgage holders' app engagement dropped the most?
+-- Top 3 rather than a longer list: further down, several customers tie on the
+-- same drop, so a top 10 has more than one correct answer.
 select d.custkey, d.engagement_drop_pct, r.mortgage_balance
 from {{ ref('dp_customer_retention_risk') }} d
 join {{ ref('rpt_customer_risk') }} r on d.custkey = r.custkey
 where r.mortgage_balance > 0
-order by d.engagement_drop_pct desc
-limit 10;
+order by d.engagement_drop_pct desc, r.mortgage_balance desc
+limit 3;
