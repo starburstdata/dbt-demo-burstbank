@@ -166,7 +166,8 @@ AI agent finale answers, run directly against `dp_customer_retention_risk`
       on the first real build. `custkey` is `varchar` in the source (not
       `bigint` as first assumed); every other column matched as written
 - [x] `slv_payments`' `unique` test on `payment_key` passes on real data
-- [ ] Incremental run on `slv_payments` creates a second snapshot
+- [x] Incremental run on `slv_payments` creates a second snapshot — confirmed
+      (Iceberg records each MERGE run as an `overwrite` snapshot)
 - [x] Column comments visible in Starburst for the gold data product —
       confirmed for the table and all 10 columns
 - [ ] `crm_mode: postgres` run succeeds against `postgresql.crm`
