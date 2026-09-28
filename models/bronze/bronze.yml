@@ -67,3 +67,6 @@ models:
         tests:
           - not_null
           - unique
+          # not_null/unique pass on an empty table; this fails if the
+          # state-level filter ever drops every row again
+          - dbt_utils.at_least_one

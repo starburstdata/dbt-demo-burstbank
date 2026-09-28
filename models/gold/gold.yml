@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: dim_customers
-    description: "Customer dimension with demographics, segmentation, and state-level geographic enrichment"
+    description: "Customer dimension with demographics, segmentation, and census enrichment for US states (state_name, region, division and population are null for Canadian customers)"
     columns:
       - name: custkey
         description: "Primary key"
