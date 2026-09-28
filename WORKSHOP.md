@@ -158,15 +158,16 @@ AI agent finale answers, run directly against `dp_customer_retention_risk`
 
 ## Merge checklist
 
-- [ ] Spot-check that the CRM metrics in `dp_customer_retention_risk` are
-      non-zero for most customers (confirms the seed `customer_id`s join to
-      real `custkey`s)
+- [x] CRM metrics in `dp_customer_retention_risk` join to real customers —
+      confirmed: 111 with complaints, 60 with close requests, 163 with an
+      engagement drop, matching the seed files
 - [ ] `dbt deps && dbt seed && dbt build` passes on a fresh Galaxy trial account
 - [x] Contract types in `gold.yml` match what dbt-trino returns — confirmed
       on the first real build. `custkey` is `varchar` in the source (not
       `bigint` as first assumed); every other column matched as written
 - [x] `slv_payments`' `unique` test on `payment_key` passes on real data
 - [ ] Incremental run on `slv_payments` creates a second snapshot
-- [ ] Column comments visible in Starburst for the gold data product
+- [x] Column comments visible in Starburst for the gold data product —
+      confirmed for the table and all 10 columns
 - [ ] `crm_mode: postgres` run succeeds against `postgresql.crm`
 - [ ] Checkpoint branches `checkpoint-0` to `checkpoint-4` build independently
