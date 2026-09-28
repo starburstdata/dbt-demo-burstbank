@@ -33,6 +33,12 @@ prefixed copy; the workshop doesn't need it because every attendee has their
 own Galaxy trial account, but drop the macro if you ever point several people
 at one catalog.
 
+The core-banking bronze models (`stg_*`) are materialized views: Starburst
+stores each result and dbt refreshes it on every run.
+`macros/materialized_view.sql` makes dbt refresh each one right after creating
+it too. Without that, Trino leaves a new materialized view unfilled until its
+first refresh, and queries read `sample.burstbank` directly in the meantime.
+
 No new models yet; this is the same data as `main`, just relaid out.
 
 ## checkpoint-1: CRM source

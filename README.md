@@ -58,7 +58,7 @@ dbt run --select gold
 ```
 models/
 ├── sources.yml          # points to sample.burstbank (read-only source)
-├── bronze/              # one view per source table, written to lakehouse.burstbank_bronze
+├── bronze/              # one materialized view per source table, written to lakehouse.burstbank_bronze
 │   ├── stg_accounts.sql
 │   ├── stg_auto_loan_payments.sql
 │   ├── stg_credit_card_payments.sql
@@ -92,7 +92,7 @@ models/
 
 ### Bronze (`lakehouse.burstbank_bronze`)
 
-Views that clean the source layer: varchar dates are cast to `date`, boolean flags (`Y`/`N`) are cast to booleans, and the `manger_id` typo in the `employee` table is corrected to `manager_id`.
+Materialized views that clean the source layer (Starburst stores each result, and dbt refreshes it on every run): varchar dates are cast to `date`, boolean flags (`Y`/`N`) are cast to booleans, and the `manger_id` typo in the `employee` table is corrected to `manager_id`.
 
 ### Gold (`lakehouse.burstbank_gold`)
 
@@ -107,5 +107,5 @@ Views that clean the source layer: varchar dates are cast to `date`, boolean fla
 | | Catalog | Schema |
 |---|---|---|
 | Source data (read-only) | `sample` | `burstbank` |
-| Bronze views | `lakehouse` | `burstbank_bronze` |
+| Bronze materialized views | `lakehouse` | `burstbank_bronze` |
 | Gold tables | `lakehouse` | `burstbank_gold` |

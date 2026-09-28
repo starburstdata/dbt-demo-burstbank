@@ -62,7 +62,12 @@ models:
       relation: true
       columns: true
     bronze:
-      +materialized: view
+      # The core-banking stg_* models are materialized views: Starburst stores
+      # each result and dbt refreshes it on every run, so downstream models
+      # don't recompute from sample.burstbank on every query. The CRM models
+      # set their own materialization (a plain view by default) so they keep
+      # reading Postgres live.
+      +materialized: materialized_view
       +schema: burstbank_bronze
       +tags: ["bronze"]
     silver:
