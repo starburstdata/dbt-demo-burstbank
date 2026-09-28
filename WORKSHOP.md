@@ -36,17 +36,19 @@ No new models yet; this is the same data as `main`, just relaid out.
 Adds a `crm` source (`models/sources.yml`) and two bronze models,
 `bronze_crm_interactions` and `bronze_crm_digital_activity`.
 
-The `crm_mode` var controls where the source actually points:
+The `crm_mode` var controls where the two bronze models read from:
 
-- `crm_mode: seed` (default) — the source reads the tables `dbt seed`
-  creates from `seeds/crm_interactions.csv` and `seeds/crm_digital_activity.csv`.
-  This is what attendees use.
-- `crm_mode: postgres` (presenter only) — the source reads the live Postgres
-  tables in `postgresql.crm` (catalog `postgresql`, schema `crm`) through
-  Starburst federation. Nothing is copied ahead of time.
+- `crm_mode: seed` (default) — the seed tables `dbt seed` creates from
+  `seeds/crm_interactions.csv` and `seeds/crm_digital_activity.csv`. This is
+  what attendees use.
+- `crm_mode: postgres` (presenter only) — the live Postgres tables in
+  `postgresql.crm` (catalog `postgresql`, schema `crm`), through the `crm`
+  source and Starburst federation. Nothing is copied ahead of time.
 
-The model SQL is identical either way — only the source's resolved
-database/schema changes.
+The model SQL is identical either way: each model reads
+`{{ crm_table('crm_interactions') }}`, and the `crm_table` macro picks the
+table. In seed mode it uses `ref()` rather than the source, so dbt knows the
+models depend on the seeds and always loads the seeds first.
 
 **Optionality moment** (presenter):
 
